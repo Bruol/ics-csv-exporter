@@ -84,18 +84,28 @@ def calculateHours(cal):
     minutes += cal[-1].duration.seconds/60
     return minutes/60
 
+def exportCsv(cal,filename):
+    file = open(filename, 'w')
+    for event in cal:
+        file.write(f"{event.name},{event.begin.datetime},{event.end.datetime},{event.duration.seconds/60}\n")
+    file.close()
 
-            
         
 
 url = "https://calendar.google.com/calendar/ical/e3ddi1frfdpqhvbe5lrg4m03r0%40group.calendar.google.com/private-c42275d2cd5a124d401e007ab4594735/basic.ics"
 
-start,end = getInput()
+#start,end = getInput()
+
+start = datetime.datetime(int(2022),int(1),int(1))
+
+end = datetime.datetime(int(2022),int(2),int(1))
 
 cal = getCal(url)
 
 cal = getTimeframe(start, end, cal)
 
 hours = calculateHours(cal)
+
+exportCsv(cal, "januar.csv")
 
 print("The total hours in the specified Timeframe are " + str(hours))
