@@ -2,7 +2,7 @@
 from ics import Calendar
 import requests
 import datetime
-import sys
+import argparse
 
 def getCal(url):
 
@@ -28,22 +28,42 @@ def getTimeframe(start, end, cal):
         
 
 def getInput():
-    # startString = input("Start date (yyyy mm dd): ")
-    # year,month,day = startString.split(" ")
-    # start = datetime.datetime(int(year),int(month),int(day))
 
-    # endString = input("End date (yyyy mm dd): ")
-    # year,month,day = endString.split(" ")
-    # end = datetime.datetime(int(year),int(month),int(day))
+    msg = "Tool to analyze Google ical Calendar from url"
 
-    # if(end < start):
-    #     print("Invalid Date")
-    #     quit()
+    parser = argparse.ArgumentParser(description = msg)
 
-    args = sys.argv
+    parser.add_argument("-s","--start",help = "specify start Date wit the following format: YYYY.MM.DD")
+    parser.add_argument("-e","--end",help = "specify end Date wit the following format: YYYY.MM.DD")
+    parser.add_argument("-u","--url",help = "specify calendatr url")
+    parser.add_argument("--csv",help = "export events to csv file with name hours-\{start date\}-\{end date\}.csv")
+    parser.add_argument("--hours",help = "print total hours")
 
-    startString = args[1]
-    endString = args[2]
+
+    args = parser.parse_args()
+
+    csv = False
+    hours = False
+
+    if args.start:
+        startString = args.start
+    else:
+        print("please specify start Date")
+        quit()
+    if args.end:
+        endString = args.end
+    else:
+        print("please specify end Date")
+        quit()
+    if args.url:
+        url = args.url
+    else:
+        print("please specify url")
+        quit()
+    if args.csv:
+        csv = True
+    if args.hours:
+        hours = True
 
     year,month,day = startString.split(".")
 
@@ -53,7 +73,7 @@ def getInput():
 
     end = datetime.datetime(int(year),int(month),int(day))
     
-    return start,end
+    return start,end,url,csv,hours
     
 
 def calculateHours(cal):
@@ -86,26 +106,26 @@ def calculateHours(cal):
 
 def exportCsv(cal,filename):
     file = open(filename, 'w')
+    date = "%d.%m.%Y"
+    time = "%H:%M:%S"
+    file.write("Titel, Datum, Startzeit, Endzeit, Dauer\n")
     for event in cal:
-        file.write(f"{event.name},{event.begin.datetime},{event.end.datetime},{event.duration.seconds/60}\n")
+        file.write(f"{event.name},{event.begin.datetime.strftime(date)},{event.begin.datetime.strftime(time)},{event.end.datetime.strftime(time)},{event.duration.seconds/60}\n")
     file.close()
 
         
+if __name__ == "__main__":
+    #url = "https://calendar.google.com/calendar/ical/e3ddi1frfdpqhvbe5lrg4m03r0%40group.calendar.google.com/private-c42275d2cd5a124d401e007ab4594735/basic.ics"
 
-url = "https://calendar.google.com/calendar/ical/e3ddi1frfdpqhvbe5lrg4m03r0%40group.calendar.google.com/private-c42275d2cd5a124d401e007ab4594735/basic.ics"
+    start,end,url,csv,hours = getInput()
 
-#start,end = getInput()
+    cal = getCal(url)
 
-start = datetime.datetime(int(2022),int(1),int(1))
+    cal = getTimeframe(start, end, cal)
 
-end = datetime.datetime(int(2022),int(2),int(1))
-
-cal = getCal(url)
-
-cal = getTimeframe(start, end, cal)
-
-hours = calculateHours(cal)
-
-exportCsv(cal, "januar.csv")
-
-print("The total hours in the specified Timeframe are " + str(hours))
+    if hours:
+        total_hours = calculateHours(cal)
+        print("The total hours in the specified Timeframe are " + str(hours))
+    if csv:
+        filename = f"hours-{start}-{end}.csv"
+        exportCsv(cal, filename)
