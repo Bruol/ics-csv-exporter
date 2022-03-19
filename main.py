@@ -25,7 +25,6 @@ def getTimeframe(start, end, cal):
             break
     res_cal = cal[startInd:endInd]
     return res_cal
-        
 
 def getInput():
 
@@ -36,8 +35,8 @@ def getInput():
     parser.add_argument("-s","--start",help = "specify start Date wit the following format: YYYY.MM.DD")
     parser.add_argument("-e","--end",help = "specify end Date wit the following format: YYYY.MM.DD")
     parser.add_argument("-u","--url",help = "specify calendatr url")
-    parser.add_argument("--csv",help = "export events to csv file with name hours-\{start date\}-\{end date\}.csv")
-    parser.add_argument("--hours",help = "print total hours")
+    parser.add_argument("--csv",help = "export events to csv file with name hours-{start date}-{end date}.csv", action='store_true')
+    parser.add_argument("--hours",help = "print total hours",action='store_true')
 
 
     args = parser.parse_args()
@@ -60,10 +59,6 @@ def getInput():
     else:
         print("please specify url")
         quit()
-    if args.csv:
-        csv = True
-    if args.hours:
-        hours = True
 
     year,month,day = startString.split(".")
 
@@ -73,8 +68,7 @@ def getInput():
 
     end = datetime.datetime(int(year),int(month),int(day))
     
-    return start,end,url,csv,hours
-    
+    return start,end,url,args.csv,args.hours   
 
 def calculateHours(cal):
     minutes = 0
@@ -115,8 +109,6 @@ def exportCsv(cal,filename):
 
         
 if __name__ == "__main__":
-    #url = "https://calendar.google.com/calendar/ical/e3ddi1frfdpqhvbe5lrg4m03r0%40group.calendar.google.com/private-c42275d2cd5a124d401e007ab4594735/basic.ics"
-
     start,end,url,csv,hours = getInput()
 
     cal = getCal(url)
@@ -127,5 +119,7 @@ if __name__ == "__main__":
         total_hours = calculateHours(cal)
         print("The total hours in the specified Timeframe are " + str(hours))
     if csv:
-        filename = f"hours-{start}-{end}.csv"
+        startString = start.strftime("%Y:%m:%d")
+        endString = end.strftime("%Y:%m:%d")
+        filename = f"hours-{startString}-{endString}.csv"
         exportCsv(cal, filename)
