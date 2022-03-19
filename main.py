@@ -117,7 +117,7 @@ if __name__ == "__main__":
 
     if hours:
         total_hours = calculateHours(cal)
-        print("The total hours in the specified Timeframe are " + str(hours))
+        print("The total hours in the specified Timeframe are " + str(total_hours))
     if csv:
         startString = start.strftime("%Y:%m:%d")
         endString = end.strftime("%Y:%m:%d")
