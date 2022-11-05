@@ -13,7 +13,7 @@ pip install -r requirements.txt
 ## for usage use.
 
 ```bash
-python3 main.py -h
+python3 ics-csv-exporter.py -h
 ```
 
 ```bash
