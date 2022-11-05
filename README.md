@@ -4,7 +4,13 @@ Python script, that can take any ICS url and convert it to CSV format. Adittiona
 
 you can also specify a timeframe with **--start** and **--end**
 
-for usage use.
+## to install all requirements do:
+
+```bash
+pip install -r requirements.txt
+```
+
+## for usage use.
 
 ```bash
 python3 main.py -h
