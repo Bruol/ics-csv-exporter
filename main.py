@@ -104,10 +104,18 @@ def exportCsv(cal,filename):
     time = "%H:%M:%S"
     file.write("Titel, Datum, Startzeit, Endzeit, Dauer\n")
     for event in cal:
-        file.write(f"{event.name},{event.begin.datetime.strftime(date)},{event.begin.datetime.strftime(time)},{event.end.datetime.strftime(time)},{event.duration.seconds/60}\n")
+        file.write(f"{event.name},{event.begin.datetime.strftime(date)},{(event.begin.datetime + datetime.timedelta(hours=2)).strftime(time)},{(event.end.datetime + datetime.timedelta(hours=2)).strftime(time)},{int(event.duration.seconds/60)}\n")
     file.close()
 
         
+def handleOverlaps(cal):
+    i = 0
+    while(i < len(cal)-1):
+        if(cal[i].end.datetime.timestamp() > cal[i+1].begin.datetime.timestamp()):
+            cal[i].end = cal[i+1].begin
+        i += 1
+    return cal
+
 if __name__ == "__main__":
     start,end,url,csv,hours = getInput()
 
@@ -119,7 +127,8 @@ if __name__ == "__main__":
         total_hours = calculateHours(cal)
         print("The total hours in the specified Timeframe are " + str(total_hours))
     if csv:
-        startString = start.strftime("%Y:%m:%d")
-        endString = end.strftime("%Y:%m:%d")
-        filename = f"hours-{startString}-{endString}.csv"
+        startString = start.strftime("%Y-%m-%d")
+        endString = end.strftime("%Y-%m-%d")
+        filename = f"hours-{startString}_{endString}.csv"
+        cal = handleOverlaps(cal)
         exportCsv(cal, filename)
